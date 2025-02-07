@@ -1,21 +1,26 @@
-.PHONY: build_backend run_backend run clean_backend
+.PHONY: backend_build backend_run backend_clean backend_sqlc run
 
-# Build the Go project inside the backend folder
-build_backend:
+#########
+# BACKEND
+#########
+
+backend_build:
 	@echo "[Backend]: Building..."
 	@cd backend && go build -o ./go-rss-scraper.exe
 	@echo "[Backend]: Built!"
 
-# Run the executable
-run_backend: build_backend
+backend_run: build_backend
 	@echo "[Backend]: Running..."
 	@cd backend && ./go-rss-scraper.exe
 
-
-#Run common
-run: run_backend
-
-# Clean the built executable
-clean_backend:
+backend_clean:
 	@echo "Cleaning up backend..."
 	@cd backend && rm -f go-rss-scraper.exe
+
+backend_sqlc:
+	@echo "[Backend]: Generating from SQL..."
+	@cd backend && sqlc generate
+	@echo "[Backend]: Generated from SQL!"
+	
+#Run common
+run: run_backend
