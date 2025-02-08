@@ -17,17 +17,19 @@ type ApiConfig struct {
 	DB *database.Queries
 }
 
-func ConnectDB() ApiConfig {
+func ConnectDB() (ApiConfig, error) {
 	err := godotenv.Load(".env")
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		fmt.Println("[Backend]: Error in connecting to Database!")
+		return ApiConfig{}, fmt.Errorf("error loading .env: %w", err)
 	}
 	connStr := os.Getenv("DATABASE_URL")
 
 	// Open DB Connection
 	conn, err := sql.Open("postgres", connStr)
 	if err != nil {
-		panic(err)
+		fmt.Println("[Backend]: Error in connecting to Database!")
+		return ApiConfig{}, fmt.Errorf("error: %w", err)
 	}
 
 	apiCfg := ApiConfig{
@@ -35,16 +37,17 @@ func ConnectDB() ApiConfig {
 	}
 
 	// Connection check
-	_, err = conn.Exec("SELECT 1")
+	err = conn.Ping()
 	if err != nil {
 		conn.Close()
-		fmt.Println("database ping failed: %w", err)
+		fmt.Println("[Backend]: Error in connecting to Database!")
+		return ApiConfig{}, fmt.Errorf("database ping failed : %w", err)
 	}
 
 	// Setting DB to global variable
 	DB = conn
 	fmt.Println("[Backend]: Database connected!")
-	return apiCfg
+	return apiCfg, nil
 }
 
 func CloseDB() error {
