@@ -28,6 +28,8 @@ func RoutesManager(apiCfg *database.ApiConfig) *chi.Mux {
 
 	DefaultRoutes(v1Router)
 	UserRoutes(v1Router, apiCfg)
+	FeedRoutes(v1Router, apiCfg)
+	FeedFollowRoutes(v1Router, apiCfg)
 
 	router.Mount("/v1", v1Router)
 	return router
@@ -45,5 +47,26 @@ func UserRoutes(v1Router *chi.Mux, apiCfg *database.ApiConfig) {
 	v1Router.Post("/users", apiCfg.UserCreateHandler)
 
 	// Get User using API Key
-	v1Router.Get("/users", apiCfg.UserGetHandler)
+	v1Router.Get("/users", apiCfg.MiddlewareAuth(apiCfg.UserGetHandler))
+}
+
+// Feed routes - all about feeds
+func FeedRoutes(v1Router *chi.Mux, apiCfg *database.ApiConfig) {
+	// Create Feed
+	v1Router.Post("/feeds", apiCfg.MiddlewareAuth(apiCfg.FeedCreateHandler))
+
+	// Get All Feeds
+	v1Router.Get("/feeds", apiCfg.FeedGetAllHandler)
+}
+
+// Feed Follow routes - all about feed follows
+func FeedFollowRoutes(v1Router *chi.Mux, apiCfg *database.ApiConfig) {
+	// Create Feed Follow
+	v1Router.Post("/feed_follows", apiCfg.MiddlewareAuth(apiCfg.FeedFollowCreateHandler))
+
+	// Get All Feed That User Follows
+	v1Router.Get("/feed_follows", apiCfg.MiddlewareAuth(apiCfg.FeedFollowGetHandler))
+
+	// Delete Feed Follow - unfollow
+	v1Router.Delete("/feed_follows/{feedFollowID}", apiCfg.MiddlewareAuth(apiCfg.FeedFollowDeleteHandler))
 }
