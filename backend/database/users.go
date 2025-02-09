@@ -3,7 +3,6 @@ package database
 import (
 	"encoding/json"
 	"fmt"
-	"go-rss-scraper/auth"
 	"go-rss-scraper/internal/database"
 	"go-rss-scraper/utils"
 	"net/http"
@@ -61,21 +60,7 @@ func (apiCfg *ApiConfig) UserCreateHandler(w http.ResponseWriter, r *http.Reques
 }
 
 // Get User
-func (apiCfg *ApiConfig) UserGetHandler(w http.ResponseWriter, r *http.Request) {
-
-	apiKey, err := auth.ExtractAPIKeyFromHeader(r.Header)
-	if err != nil {
-		utils.RespondWithError(w, 403, fmt.Sprintf("Auth Error. Error extracting API Key %v", err))
-		return
-	}
-
-	user, err := apiCfg.DB.GetUserByAPIKey(r.Context(), apiKey)
-
-	if err != nil {
-		utils.RespondWithError(w, 400, fmt.Sprintf("Couldn't get user %v", err))
-		return
-	}
-
+func (apiCfg *ApiConfig) UserGetHandler(w http.ResponseWriter, r *http.Request, user database.User) {
 	// UserNamingConversion just adds OUR naming that we need and not the generated from sqlc
 	utils.RespondWithJSON(w, 200, UserNamingConversion(user))
 }
