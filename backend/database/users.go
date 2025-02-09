@@ -1,7 +1,6 @@
 package database
 
 import (
-	"encoding/json"
 	"fmt"
 	"go-rss-scraper/internal/database"
 	"go-rss-scraper/utils"
@@ -35,11 +34,10 @@ func (apiCfg *ApiConfig) UserCreateHandler(w http.ResponseWriter, r *http.Reques
 	type parameters struct {
 		Name string `json:"name"`
 	}
-	decoder := json.NewDecoder(r.Body)
-	params := parameters{}
-	err := decoder.Decode(&params)
-	if err != nil {
-		utils.RespondWithError(w, 400, fmt.Sprintf("Error parsing JSON: %v", err))
+
+	// It gets the params from the request
+	params := utils.GetParams[parameters](r, w)
+	if params == nil {
 		return
 	}
 
