@@ -1,0 +1,105 @@
+"use client";
+
+import { Button } from "@/components/ui/button";
+import {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+} from "@/components/ui/navigation-menu";
+import { Separator } from "@/components/ui/separator";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { DialogTitle } from "@radix-ui/react-dialog";
+import { Menu } from "lucide-react";
+import Link from "next/link";
+import * as React from "react";
+import { ThemeToggle } from "./theme-toggle";
+
+const navItems = [
+  { title: "Feeds", href: "/about" },
+  { title: "Followed Feeds", href: "/blog" },
+  { title: "Latest Posts", href: "/services" },
+  { title: "Add Feed", href: "/contact" },
+];
+
+export function Header() {
+  const [isOpen, setIsOpen] = React.useState(false);
+
+  return (
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex justify-center items-center">
+      <div className="w-[95%] md:w-4/5 container flex h-14 justify-between items-center">
+        <div className="mr-4 hidden md:flex">
+          <Link href="/" className="mr-10 flex items-center space-x-2">
+            <span className="hidden font-bold sm:inline-block">
+              RSS Feed Scraper
+            </span>
+          </Link>
+          <NavigationMenu>
+            <NavigationMenuList className="gap-2 md:gap-4">
+              {navItems.map((item) => (
+                <NavigationMenuItem key={item.title}>
+                  <Link href={item.href} legacyBehavior passHref>
+                    <NavigationMenuLink className="text-sm hover:underline underline-offset-2 transition-all duration-100 ease-linear">
+                      {item.title}
+                    </NavigationMenuLink>
+                  </Link>
+                </NavigationMenuItem>
+              ))}
+            </NavigationMenuList>
+          </NavigationMenu>
+        </div>
+        <Sheet open={isOpen} onOpenChange={setIsOpen}>
+          <SheetDescription className="sr-only">Menu</SheetDescription>
+          <DialogTitle className="sr-only">Menu</DialogTitle>
+
+          <SheetTrigger asChild>
+            <Button
+              variant="ghost"
+              className="ml-3 px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 md:hidden"
+            >
+              <Menu className="min-h-5 min-w-5 h-5 w-5" />
+              <span className="sr-only">Toggle Menu</span>
+            </Button>
+          </SheetTrigger>
+          <SheetContent
+            side="left"
+            className="pr-0"
+            aria-description="Main navigation"
+          >
+            <Link
+              href="/"
+              className="flex items-center"
+              onClick={() => setIsOpen(false)}
+            >
+              <span className="font-bold">RSS Feed Scraper</span>
+            </Link>
+            <Separator className="my-4" />
+            <nav className="flex flex-col space-y-4">
+              {navItems.map((item) => (
+                <Link
+                  key={item.title}
+                  href={item.href}
+                  className="text-sm font-medium transition-colors hover:text-primary"
+                  onClick={() => setIsOpen(false)}
+                >
+                  {item.title}
+                </Link>
+              ))}
+            </nav>
+          </SheetContent>
+        </Sheet>
+        <div className="md:w-auto md:flex-none flex justify-center items-center gap-2">
+          <ThemeToggle />
+          <Button className="max-w-20 w-full md:w-auto" size="sm">
+            Sign In
+          </Button>
+        </div>
+      </div>
+    </header>
+  );
+}
