@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/joho/godotenv"
 )
@@ -24,6 +25,9 @@ func main() {
 		log.Fatal(err)
 	}
 	defer database.CloseDB()
+
+	// Start the scraper
+	go StartScraper(apiCfg.DB, 10, time.Minute)
 
 	// setup router and routes
 	router := RoutesManager(&apiCfg)

@@ -30,6 +30,7 @@ func RoutesManager(apiCfg *database.ApiConfig) *chi.Mux {
 	UserRoutes(v1Router, apiCfg)
 	FeedRoutes(v1Router, apiCfg)
 	FeedFollowRoutes(v1Router, apiCfg)
+	PostsRoutes(v1Router, apiCfg)
 
 	router.Mount("/v1", v1Router)
 	return router
@@ -69,4 +70,10 @@ func FeedFollowRoutes(v1Router *chi.Mux, apiCfg *database.ApiConfig) {
 
 	// Delete Feed Follow - unfollow
 	v1Router.Delete("/feed_follows/{feedFollowID}", apiCfg.MiddlewareAuth(apiCfg.FeedFollowDeleteHandler))
+}
+
+// Posts routes
+func PostsRoutes(v1Router *chi.Mux, apiCfg *database.ApiConfig) {
+	// Get Posts For User
+	v1Router.Get("/users/latest_posts", apiCfg.MiddlewareAuth(apiCfg.GetPostsForUserHandler))
 }
