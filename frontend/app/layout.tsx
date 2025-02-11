@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Providers from "@/providers/providers";
 import { Header } from "@/components/header";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "RSS Scraper",
@@ -19,6 +20,7 @@ export default function RootLayout({
       <body className="bg-background text-foreground">
         <Providers>
           <Header />
+          <Toaster />
           {children}
         </Providers>
       </body>
