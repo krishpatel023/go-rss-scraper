@@ -1,7 +1,7 @@
 package database
 
 import (
-	"fmt"
+	"context"
 	"go-rss-scraper/internal/database"
 	"go-rss-scraper/utils"
 	"net/http"
@@ -29,32 +29,26 @@ func UserNamingConversion(dbUser database.User) User {
 	}
 }
 
-// Create User
-func (apiCfg *ApiConfig) UserCreateHandler(w http.ResponseWriter, r *http.Request) {
-	type parameters struct {
-		Name string `json:"name"`
-	}
+type UserCreationParameters struct {
+	Name string `json:"name"`
+}
 
-	// It gets the params from the request
-	params := utils.GetParams[parameters](r, w)
-	if params == nil {
-		return
-	}
+// Create User - Linked with Auth - SignUpHandler
+func (apiCfg *ApiConfig) UserCreateHandler(data UserCreationParameters) (User, error) {
 
-	user, err := apiCfg.DB.CreateUser(r.Context(), database.CreateUserParams{
+	user, err := apiCfg.DB.CreateUser(context.Background(), database.CreateUserParams{
 		ID:        uuid.New(),
 		CreatedAt: time.Now().UTC(),
 		UpdatedAt: time.Now().UTC(),
-		Name:      params.Name,
+		Name:      data.Name,
 	})
 
 	if err != nil {
-		utils.RespondWithError(w, 400, fmt.Sprintf("Couldn't create user %v", err))
-		return
+		return User{}, err
 	}
 
 	// UserNamingConversion just adds OUR naming that we need and not the generated from sqlc
-	utils.RespondWithJSON(w, 201, UserNamingConversion(user))
+	return UserNamingConversion(user), nil
 }
 
 // Get User

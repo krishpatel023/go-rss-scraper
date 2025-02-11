@@ -31,6 +31,7 @@ func RoutesManager(apiCfg *database.ApiConfig) *chi.Mux {
 	FeedRoutes(v1Router, apiCfg)
 	FeedFollowRoutes(v1Router, apiCfg)
 	PostsRoutes(v1Router, apiCfg)
+	AuthRoutes(v1Router, apiCfg)
 
 	router.Mount("/v1", v1Router)
 	return router
@@ -44,9 +45,6 @@ func DefaultRoutes(v1Router *chi.Mux) {
 
 // User routes - all about users
 func UserRoutes(v1Router *chi.Mux, apiCfg *database.ApiConfig) {
-	// Create User
-	v1Router.Post("/users", apiCfg.UserCreateHandler)
-
 	// Get User using API Key
 	v1Router.Get("/users", apiCfg.MiddlewareAuth(apiCfg.UserGetHandler))
 }
@@ -76,4 +74,13 @@ func FeedFollowRoutes(v1Router *chi.Mux, apiCfg *database.ApiConfig) {
 func PostsRoutes(v1Router *chi.Mux, apiCfg *database.ApiConfig) {
 	// Get Posts For User
 	v1Router.Get("/users/latest_posts", apiCfg.MiddlewareAuth(apiCfg.GetPostsForUserHandler))
+}
+
+// Auth routes
+func AuthRoutes(v1Router *chi.Mux, apiCfg *database.ApiConfig) {
+	// SignUp
+	v1Router.Post("/auth/signup", apiCfg.SignUpHandler)
+
+	// Login
+	v1Router.Post("/auth/login", apiCfg.LoginHandler)
 }
