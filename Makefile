@@ -1,4 +1,4 @@
-.PHONY: backend_build backend_run backend_clean backend_sqlc backend_migrate run
+.PHONY: backend_build backend_run backend_clean backend_sqlc backend_migrate frontend_build frontend_run
 
 #########
 # BACKEND
@@ -39,5 +39,16 @@ backend_migrate_down:
 	@echo "[Backend]: Migrated Down Successfully"
 
 
-#Run common
-run: backend_run
+
+###########
+# FRONTEND
+###########
+
+frontend_build:
+	@echo "[Frontend]: Building..."
+	@cd frontend && npm run build
+	@echo "[Frontend]: Built!"
+
+frontend_run:
+	@echo "[Frontend]: Running..."
+	@cd frontend && npm run dev
