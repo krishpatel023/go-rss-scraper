@@ -2,7 +2,7 @@ import axios from "axios";
 import env from "./env";
 import { getCookie } from "@/app/actions/cookies";
 
-const AUTH_TOKEN_NAME = "ApiKey";
+export const AUTH_TOKEN_NAME = "ApiKey";
 
 const api = {
   get: async (url: string) => {

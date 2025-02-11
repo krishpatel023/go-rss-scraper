@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import api from "@/lib/axios"; // Import Axios instance
+import api, { AUTH_TOKEN_NAME } from "@/lib/axios"; // Import Axios instance
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,6 +18,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { getCookie, setCookie } from "../actions/cookies";
 
 export default function Page() {
   return (
@@ -42,6 +44,7 @@ function handleSignup(data: { email: string; password: string }) {
   return api
     .post("/v1/auth/signup", data)
     .then((res) => {
+      setCookie(AUTH_TOKEN_NAME, res.data.api_key);
       return res.data;
     })
     .catch((error) => {
@@ -63,16 +66,30 @@ function SignupForm({
   });
 
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   const onSubmit = async (data: any) => {
     try {
       await handleSignup(data);
       setError(null);
       toast("Account Created Successfully!");
+      router.push("/feeds");
     } catch (err: any) {
       setError(err);
     }
   };
+
+  useEffect(() => {
+    async function checkForToken() {
+      const token = await getCookie(AUTH_TOKEN_NAME);
+      if (token) {
+        toast("You are already logged in!");
+        router.push("/feeds");
+      }
+    }
+
+    checkForToken();
+  }, []);
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
