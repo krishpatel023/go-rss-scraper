@@ -11,6 +11,15 @@ import (
 	"github.com/google/uuid"
 )
 
+type Auth struct {
+	ID        int32
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Email     string
+	Password  string
+	UserID    uuid.UUID
+}
+
 type Feed struct {
 	ID            uuid.UUID
 	CreatedAt     time.Time
