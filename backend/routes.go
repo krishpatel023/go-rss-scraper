@@ -59,18 +59,27 @@ func FeedRoutes(v1Router *chi.Mux, apiCfg *database.ApiConfig) {
 
 	// Validate RSS Feed URL
 	v1Router.Post("/feeds/validate-rss", apiCfg.ValidateRSSFeedURL)
+
+	// Get Posts By Feed ID
+	v1Router.Get("/feed_posts/{feedID}", apiCfg.GetPostsByFeedIDHandler)
+
+	// Get Feed By ID
+	v1Router.Get("/feed/{feedID}", apiCfg.GetFeedByIDHandler)
 }
 
 // Feed Follow routes - all about feed follows
 func FeedFollowRoutes(v1Router *chi.Mux, apiCfg *database.ApiConfig) {
 	// Create Feed Follow
-	v1Router.Post("/feed_follows", apiCfg.MiddlewareAuth(apiCfg.FeedFollowCreateHandler))
+	v1Router.Post("/feed_follows/{feedID}", apiCfg.MiddlewareAuth(apiCfg.FeedFollowCreateHandler))
 
 	// Get All Feed That User Follows
 	v1Router.Get("/feed_follows", apiCfg.MiddlewareAuth(apiCfg.FeedFollowGetHandler))
 
 	// Delete Feed Follow - unfollow
 	v1Router.Delete("/feed_follows/{feedFollowID}", apiCfg.MiddlewareAuth(apiCfg.FeedFollowDeleteHandler))
+
+	// Check if User Follows Feed
+	v1Router.Get("/feed_follows/check/{feedID}", apiCfg.MiddlewareAuth(apiCfg.FeedFollowCheckHandler))
 }
 
 // Posts routes
