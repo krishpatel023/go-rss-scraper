@@ -25,6 +25,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   signin: (user: User) => void;
   signout: () => void;
+  isLoading: boolean;
 }
 
 // Create Context with default values
@@ -33,6 +34,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [userData, setUserData] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     async function checkAuth() {
@@ -53,6 +55,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         localStorage.removeItem("userData");
         return;
       }
+      setIsLoading(false);
     }
     checkAuth();
   }, []);
@@ -73,7 +76,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AuthContext.Provider
-      value={{ userData, isAuthenticated, signin, signout }}
+      value={{ userData, isAuthenticated, signin, signout, isLoading }}
     >
       {children}
     </AuthContext.Provider>
