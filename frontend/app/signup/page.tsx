@@ -20,6 +20,7 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { getCookie, setCookie } from "../actions/cookies";
+import { useAuth } from "@/providers/auth";
 
 export default function Page() {
   return (
@@ -40,19 +41,6 @@ const signupSchema = z.object({
     .max(32, "Password must be at most 32 characters"),
 });
 
-function handleSignup(data: { email: string; password: string }) {
-  return api
-    .post("/v1/auth/signup", data)
-    .then((res) => {
-      setCookie(AUTH_TOKEN_NAME, res.data.api_key);
-      return res.data;
-    })
-    .catch((error) => {
-      console.log(error);
-      throw error.response?.data?.error || "Signup failed";
-    });
-}
-
 function SignupForm({
   className,
   ...props
@@ -67,6 +55,26 @@ function SignupForm({
 
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const { signin, isAuthenticated } = useAuth();
+
+  function handleSignup(data: { email: string; password: string }) {
+    return api
+      .post("/v1/auth/signup", data)
+      .then((res) => {
+        setCookie(AUTH_TOKEN_NAME, res.data.api_key);
+        const res_data = {
+          id: res.data.id,
+          created_at: res.data.created_at,
+          updated_at: res.data.updated_at,
+          name: res.data.name,
+        };
+        signin(res_data);
+        return res.data;
+      })
+      .catch((error) => {
+        throw error.response?.data?.error || "Signup failed";
+      });
+  }
 
   const onSubmit = async (data: any) => {
     try {
@@ -80,16 +88,11 @@ function SignupForm({
   };
 
   useEffect(() => {
-    async function checkForToken() {
-      const token = await getCookie(AUTH_TOKEN_NAME);
-      if (token) {
-        toast("You are already logged in!");
-        router.push("/feeds");
-      }
+    if (isAuthenticated) {
+      toast("You are already logged in!");
+      router.push("/feeds");
     }
-
-    checkForToken();
-  }, []);
+  }, [isAuthenticated]);
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>

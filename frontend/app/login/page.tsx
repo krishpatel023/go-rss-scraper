@@ -1,11 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import api, { AUTH_TOKEN_NAME } from "@/lib/axios";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -16,11 +10,18 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
-import { toast } from "sonner";
+import api, { AUTH_TOKEN_NAME } from "@/lib/axios";
+import { cn } from "@/lib/utils";
+import { useAuth } from "@/providers/auth";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { getCookie, setCookie } from "../actions/cookies";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
+import { setCookie } from "../actions/cookies";
 
 export default function Page() {
   return (
@@ -41,17 +42,6 @@ const loginSchema = z.object({
     .max(32, "Password must be at most 32 characters"),
 });
 
-// Login API function
-async function handleLogin(data: { email: string; password: string }) {
-  try {
-    const res = await api.post("/v1/auth/login", data);
-    setCookie(AUTH_TOKEN_NAME, res.data.api_key);
-    return res.data;
-  } catch (error: any) {
-    throw error.response?.data?.message || "Login failed";
-  }
-}
-
 export function LoginForm({
   className,
   ...props
@@ -65,8 +55,26 @@ export function LoginForm({
   });
 
   const [error, setError] = useState<string | null>(null);
-
   const router = useRouter();
+  const { isAuthenticated, signin } = useAuth();
+
+  // Login API function
+  async function handleLogin(data: { email: string; password: string }) {
+    try {
+      const res = await api.post("/v1/auth/login", data);
+      setCookie(AUTH_TOKEN_NAME, res.data.api_key);
+      const res_data = {
+        id: res.data.id,
+        created_at: res.data.created_at,
+        updated_at: res.data.updated_at,
+        name: res.data.name,
+      };
+      signin(res_data);
+      return res.data;
+    } catch (error: any) {
+      throw error.response?.data?.message || "Login failed";
+    }
+  }
 
   const onSubmit = async (data: any) => {
     try {
@@ -80,16 +88,11 @@ export function LoginForm({
   };
 
   useEffect(() => {
-    async function checkForToken() {
-      const token = await getCookie(AUTH_TOKEN_NAME);
-      if (token) {
-        toast("You are already logged in!");
-        router.push("/feeds");
-      }
+    if (isAuthenticated) {
+      toast("You are already logged in!");
+      router.push("/feeds");
     }
-
-    checkForToken();
-  }, []);
+  }, [isAuthenticated]);
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
