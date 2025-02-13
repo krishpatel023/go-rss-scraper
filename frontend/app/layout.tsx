@@ -3,6 +3,7 @@ import "./globals.css";
 import Providers from "@/providers/providers";
 import { Header } from "@/components/header";
 import { Toaster } from "@/components/ui/sonner";
+import Footer from "@/components/footer";
 
 export const metadata: Metadata = {
   title: "RSS Scraper",
@@ -17,11 +18,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="bg-background text-foreground">
+      <body className="bg-background text-foreground flex flex-col min-h-screen">
         <Providers>
-          <Header />
           <Toaster />
-          <main className="w-[95%] md:w-4/5 mx-auto h-14">{children}</main>
+          <Header />
+          <main className="w-[95%] md:w-4/5 mx-auto">{children}</main>
+          <Footer />
         </Providers>
       </body>
     </html>

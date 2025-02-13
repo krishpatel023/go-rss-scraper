@@ -23,9 +23,9 @@ import AddFeed from "./add-feed";
 import { ThemeToggle } from "./theme-toggle";
 
 const navItems = [
-  { title: "Feeds", href: "/about" },
-  { title: "Followed Feeds", href: "/blog" },
-  { title: "Latest Posts", href: "/services" },
+  { title: "Feeds", href: "/feeds" },
+  { title: "Followed Feeds", href: "/followed-feeds" },
+  { title: "Latest Posts", href: "/latest-posts" },
 ];
 
 export function Header() {
@@ -40,7 +40,7 @@ export function Header() {
             className="mr-10 flex items-center space-x-2"
             suppressHydrationWarning
           >
-            <span className="hidden font-bold sm:inline-block">
+            <span className="hidden font-bold sm:inline-block hover:cursor-pointer">
               RSS Feed Scraper
             </span>
           </Link>
@@ -51,7 +51,7 @@ export function Header() {
                   <Link href={item.href} legacyBehavior passHref>
                     <NavigationMenuLink
                       asChild
-                      className="text-sm hover:underline underline-offset-2 transition-all duration-100 ease-linear"
+                      className="text-sm hover:underline underline-offset-2 transition-all duration-100 ease-linear hover:cursor-pointer"
                     >
                       <span>{item.title}</span>
                     </NavigationMenuLink>
@@ -59,7 +59,7 @@ export function Header() {
                 </NavigationMenuItem>
               ))}
               <AddFeed>
-                <div className="text-sm hover:underline underline-offset-2 transition-all duration-100 ease-linear">
+                <div className="text-sm hover:underline underline-offset-2 transition-all duration-100 ease-linear hover:cursor-pointer">
                   Add Feed
                 </div>
               </AddFeed>
@@ -73,7 +73,7 @@ export function Header() {
           <SheetTrigger asChild>
             <Button
               variant="ghost"
-              className="ml-3 px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 md:hidden"
+              className="ml-3 px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 md:hidden hover:cursor-pointer"
             >
               <Menu className="min-h-5 min-w-5 h-5 w-5" />
               <span className="sr-only">Toggle Menu</span>
@@ -86,7 +86,7 @@ export function Header() {
           >
             <Link
               href="/"
-              className="flex items-center"
+              className="flex items-center hover:cursor-pointer"
               onClick={() => setIsOpen(false)}
             >
               <span className="font-bold">RSS Feed Scraper</span>
