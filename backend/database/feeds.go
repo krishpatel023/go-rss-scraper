@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-chi/chi"
 	"github.com/google/uuid"
 )
 
@@ -115,4 +116,23 @@ func (apiCfg *ApiConfig) ValidateRSSFeedURL(w http.ResponseWriter, r *http.Reque
 	utils.RespondWithJSON(w, 200, map[string]string{
 		"message": "Feed URL is valid",
 	})
+}
+
+func (apiCfg *ApiConfig) GetFeedByIDHandler(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "feedID")
+	parsed_id, err := uuid.Parse(id)
+
+	if err != nil {
+		utils.RespondWithError(w, 400, "Couldn't parse feed's UUID")
+		return
+	}
+
+	// Get the posts by feed ID
+	feed, err := apiCfg.DB.GetFeedByID(r.Context(), parsed_id)
+	if err != nil {
+		utils.RespondWithError(w, 400, "Couldn't get posts by feed ID")
+		return
+	}
+
+	utils.RespondWithJSON(w, 200, FeedsNamingConversion(feed))
 }
