@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/go-chi/chi"
 	"github.com/google/uuid"
 )
 
@@ -63,4 +64,28 @@ func (apiCfg *ApiConfig) GetPostsForUserHandler(w http.ResponseWriter, r *http.R
 
 	utils.RespondWithJSON(w, 201, converted_posts)
 
+}
+
+func (apiCfg *ApiConfig) GetPostsByFeedIDHandler(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "feedID")
+	parsed_id, err := uuid.Parse(id)
+
+	if err != nil {
+		utils.RespondWithError(w, 400, "Couldn't parse feed's UUID")
+		return
+	}
+
+	// Get the posts by feed ID
+	posts, err := apiCfg.DB.GetAllPostsByFeedID(r.Context(), parsed_id)
+	if err != nil {
+		utils.RespondWithError(w, 400, "Couldn't get posts by feed ID")
+		return
+	}
+
+	converted_posts := []Posts{}
+	for _, post := range posts {
+		converted_posts = append(converted_posts, PostsNamingConversion(post))
+	}
+
+	utils.RespondWithJSON(w, 200, converted_posts)
 }

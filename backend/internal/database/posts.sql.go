@@ -55,6 +55,91 @@ func (q *Queries) CreatePost(ctx context.Context, arg CreatePostParams) (Post, e
 	return i, err
 }
 
+const getAllPostsByFeedID = `-- name: GetAllPostsByFeedID :many
+SELECT posts.id, posts.created_at, posts.updated_at, posts.title, posts.published_at, posts.url, posts.description, posts.feed_id FROM posts
+JOIN feeds ON posts.feed_id = feeds.id
+WHERE posts.feed_id = $1
+ORDER BY posts.published_at DESC
+`
+
+func (q *Queries) GetAllPostsByFeedID(ctx context.Context, feedID uuid.UUID) ([]Post, error) {
+	rows, err := q.db.QueryContext(ctx, getAllPostsByFeedID, feedID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Post
+	for rows.Next() {
+		var i Post
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Title,
+			&i.PublishedAt,
+			&i.Url,
+			&i.Description,
+			&i.FeedID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getPostsByFeedID = `-- name: GetPostsByFeedID :many
+SELECT posts.id, posts.created_at, posts.updated_at, posts.title, posts.published_at, posts.url, posts.description, posts.feed_id FROM posts
+JOIN feeds ON posts.feed_id = feeds.id
+WHERE posts.feed_id = $1
+ORDER BY posts.published_at DESC
+LIMIT $2 OFFSET $3
+`
+
+type GetPostsByFeedIDParams struct {
+	FeedID uuid.UUID
+	Limit  int32
+	Offset int32
+}
+
+func (q *Queries) GetPostsByFeedID(ctx context.Context, arg GetPostsByFeedIDParams) ([]Post, error) {
+	rows, err := q.db.QueryContext(ctx, getPostsByFeedID, arg.FeedID, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Post
+	for rows.Next() {
+		var i Post
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.Title,
+			&i.PublishedAt,
+			&i.Url,
+			&i.Description,
+			&i.FeedID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getPostsForUser = `-- name: GetPostsForUser :many
 SELECT posts.id, posts.created_at, posts.updated_at, posts.title, posts.published_at, posts.url, posts.description, posts.feed_id FROM posts
 JOIN feed_follows ON posts.feed_id = feed_follows.feed_id
