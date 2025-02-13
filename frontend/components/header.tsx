@@ -35,7 +35,11 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex justify-center items-center">
       <div className="w-[95%] md:w-4/5 container flex h-14 justify-between items-center">
         <div className="mr-4 hidden md:flex">
-          <Link href="/" className="mr-10 flex items-center space-x-2">
+          <Link
+            href="/"
+            className="mr-10 flex items-center space-x-2"
+            suppressHydrationWarning
+          >
             <span className="hidden font-bold sm:inline-block">
               RSS Feed Scraper
             </span>
@@ -45,18 +49,19 @@ export function Header() {
               {navItems.map((item) => (
                 <NavigationMenuItem key={item.title}>
                   <Link href={item.href} legacyBehavior passHref>
-                    <NavigationMenuLink className="text-sm hover:underline underline-offset-2 transition-all duration-100 ease-linear">
-                      {item.title}
+                    <NavigationMenuLink
+                      asChild
+                      className="text-sm hover:underline underline-offset-2 transition-all duration-100 ease-linear"
+                    >
+                      <span>{item.title}</span>
                     </NavigationMenuLink>
                   </Link>
                 </NavigationMenuItem>
               ))}
               <AddFeed>
-                <NavigationMenuItem key={"add-feed"}>
-                  <NavigationMenuLink className="text-sm hover:underline underline-offset-2 transition-all duration-100 ease-linear">
-                    Add Feed
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
+                <div className="text-sm hover:underline underline-offset-2 transition-all duration-100 ease-linear">
+                  Add Feed
+                </div>
               </AddFeed>
             </NavigationMenuList>
           </NavigationMenu>
@@ -117,6 +122,24 @@ export function Header() {
 
 function AuthButton() {
   const { isAuthenticated, signout } = useAuth();
+
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted)
+    return (
+      <Link
+        href="/login"
+        className="bg-primary text-primary-foreground hover:bg-primary/90 h-9 rounded-md px-3 flex justify-center items-center"
+        suppressHydrationWarning
+      >
+        Login
+      </Link>
+    );
+
   return (
     <>
       {isAuthenticated ? (
@@ -132,6 +155,7 @@ function AuthButton() {
         <Link
           href="/login"
           className="bg-primary text-primary-foreground hover:bg-primary/90 h-9 rounded-md px-3 flex justify-center items-center"
+          suppressHydrationWarning
         >
           Login
         </Link>
