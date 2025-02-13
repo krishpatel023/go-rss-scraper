@@ -56,6 +56,9 @@ func FeedRoutes(v1Router *chi.Mux, apiCfg *database.ApiConfig) {
 
 	// Get All Feeds
 	v1Router.Get("/feeds", apiCfg.FeedGetAllHandler)
+
+	// Validate RSS Feed URL
+	v1Router.Post("/feeds/validate-rss", apiCfg.ValidateRSSFeedURL)
 }
 
 // Feed Follow routes - all about feed follows

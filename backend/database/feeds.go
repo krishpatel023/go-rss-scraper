@@ -1,6 +1,7 @@
 package database
 
 import (
+	"database/sql"
 	"fmt"
 	"go-rss-scraper/internal/database"
 	"go-rss-scraper/utils"
@@ -79,4 +80,39 @@ func (apiCfg *ApiConfig) FeedGetAllHandler(w http.ResponseWriter, r *http.Reques
 	}
 
 	utils.RespondWithJSON(w, 200, converted_feeds)
+}
+
+func (apiCfg *ApiConfig) ValidateRSSFeedURL(w http.ResponseWriter, r *http.Request) {
+	type parameters struct {
+		URL string `json:"url"`
+	}
+
+	// It gets the params from the request
+	params := utils.GetParams[parameters](r, w)
+	if params == nil {
+		return
+	}
+
+	// It validates the RSS feed URL
+	_, err := utils.URLToFeed(params.URL)
+	if err != nil {
+		utils.RespondWithError(w, 400, "Couldn't validate feed URL")
+		return
+	}
+
+	// It checks if the RSS feed URL is already in the database
+	feed, err := apiCfg.DB.GetFeedByURL(r.Context(), params.URL)
+	if err != nil && err != sql.ErrNoRows {
+		utils.RespondWithError(w, 400, "Couldn't validate feed URL")
+		return
+	}
+
+	if feed.ID != uuid.Nil {
+		utils.RespondWithError(w, 400, "Feed already exists.")
+		return
+	}
+
+	utils.RespondWithJSON(w, 200, map[string]string{
+		"message": "Feed URL is valid",
+	})
 }
