@@ -11,7 +11,9 @@ SELECT EXISTS (
 );
 
 -- name: GetAllFeedUserFollows :many
-SELECT * FROM feed_follows WHERE user_id = $1;
+SELECT feeds.* FROM feeds
+INNER JOIN feed_follows ON feeds.id = feed_follows.feed_id
+WHERE feed_follows.user_id = $1;
 
 -- name: DeleteFeedFollow :exec
 DELETE FROM feed_follows WHERE id = $1 AND user_id = $2;

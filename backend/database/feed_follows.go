@@ -68,10 +68,10 @@ func (apiCfg *ApiConfig) FeedFollowGetHandler(w http.ResponseWriter, r *http.Req
 	}
 
 	// Convert to FeedsNamingConversion
-	converted_feeds := []FeedsFollow{}
+	converted_feeds := []Feeds{}
 
 	for _, feed := range feeds_user_follows {
-		converted_feeds = append(converted_feeds, FeedsFollowNamingConversion(feed))
+		converted_feeds = append(converted_feeds, FeedsNamingConversion(feed))
 	}
 
 	utils.RespondWithJSON(w, 200, converted_feeds)
