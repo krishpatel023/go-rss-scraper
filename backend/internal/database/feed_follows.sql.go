@@ -12,6 +12,26 @@ import (
 	"github.com/google/uuid"
 )
 
+const checkIfUserFollowsFeed = `-- name: CheckIfUserFollowsFeed :one
+SELECT EXISTS (
+    SELECT 1
+    FROM feed_follows
+    WHERE feed_id = $1 AND user_id = $2
+)
+`
+
+type CheckIfUserFollowsFeedParams struct {
+	FeedID uuid.UUID
+	UserID uuid.UUID
+}
+
+func (q *Queries) CheckIfUserFollowsFeed(ctx context.Context, arg CheckIfUserFollowsFeedParams) (bool, error) {
+	row := q.db.QueryRowContext(ctx, checkIfUserFollowsFeed, arg.FeedID, arg.UserID)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
 const createFeedFollow = `-- name: CreateFeedFollow :one
 INSERT INTO feed_follows (id, created_at, updated_at, feed_id, user_id)
 VALUES ($1, $2, $3, $4, $5)

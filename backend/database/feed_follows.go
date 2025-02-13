@@ -32,13 +32,12 @@ func FeedsFollowNamingConversion(dbFeedFollow database.FeedFollow) FeedsFollow {
 
 // Create Feed Follow
 func (apiCfg *ApiConfig) FeedFollowCreateHandler(w http.ResponseWriter, r *http.Request, user database.User) {
-	type parameters struct {
-		FeedID uuid.UUID `json:"feed_id"`
-	}
 
-	// It gets the params from the request
-	params := utils.GetParams[parameters](r, w)
-	if params == nil {
+	feed_id := chi.URLParam(r, "feedID")
+	parsed_feed_id, err := uuid.Parse(feed_id)
+
+	if err != nil {
+		utils.RespondWithError(w, 400, fmt.Sprintf("Couldn't parse feed id %v", err))
 		return
 	}
 
@@ -46,7 +45,7 @@ func (apiCfg *ApiConfig) FeedFollowCreateHandler(w http.ResponseWriter, r *http.
 		ID:        uuid.New(),
 		CreatedAt: time.Now().UTC(),
 		UpdatedAt: time.Now().UTC(),
-		FeedID:    params.FeedID,
+		FeedID:    parsed_feed_id,
 		UserID:    user.ID,
 	})
 
@@ -100,4 +99,30 @@ func (apiCfg *ApiConfig) FeedFollowDeleteHandler(w http.ResponseWriter, r *http.
 	}
 
 	utils.RespondWithJSON(w, 200, struct{}{})
+}
+
+// Check if a user follows a feed
+func (apiCfg *ApiConfig) FeedFollowCheckHandler(w http.ResponseWriter, r *http.Request, user database.User) {
+	feed_id := chi.URLParam(r, "feedID")
+	parsed_feed_id, err := uuid.Parse(feed_id)
+	if err != nil {
+		utils.RespondWithError(w, 400, fmt.Sprintf("Couldn't parse feed id %v", err))
+		return
+	}
+
+	exists, err := apiCfg.DB.CheckIfUserFollowsFeed(r.Context(), database.CheckIfUserFollowsFeedParams{
+		FeedID: parsed_feed_id,
+		UserID: user.ID,
+	})
+
+	if err != nil {
+		utils.RespondWithError(w, 400, fmt.Sprintf("Couldn't check if user follows feed %v", err))
+		return
+	}
+
+	utils.RespondWithJSON(w, 200, struct {
+		Exists bool `json:"exists"`
+	}{
+		Exists: exists,
+	})
 }
