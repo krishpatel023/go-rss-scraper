@@ -11,7 +11,7 @@ const api = {
     return await axios.get(env.NEXT_PUBLIC_BACKEND_URL + url, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: AUTH_TOKEN_NAME + cookie,
+        Authorization: `${AUTH_TOKEN_NAME} ${cookie}`,
       },
     });
   },
@@ -21,7 +21,7 @@ const api = {
     return await axios.post(env.NEXT_PUBLIC_BACKEND_URL + url, data, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: AUTH_TOKEN_NAME + cookie,
+        Authorization: `${AUTH_TOKEN_NAME} ${cookie}`,
       },
     });
   },
@@ -31,7 +31,7 @@ const api = {
     return await axios.put(env.NEXT_PUBLIC_BACKEND_URL + url, data, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: AUTH_TOKEN_NAME + cookie,
+        Authorization: `${AUTH_TOKEN_NAME} ${cookie}`,
       },
     });
   },
@@ -41,7 +41,7 @@ const api = {
     return await axios.delete(env.NEXT_PUBLIC_BACKEND_URL + url, {
       headers: {
         "Content-Type": "application/json",
-        Authorization: AUTH_TOKEN_NAME + cookie,
+        Authorization: `${AUTH_TOKEN_NAME} ${cookie}`,
       },
     });
   },
