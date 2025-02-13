@@ -14,17 +14,18 @@ import {
   SheetDescription,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { useAuth } from "@/providers/auth";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { Menu } from "lucide-react";
 import Link from "next/link";
 import * as React from "react";
+import AddFeed from "./add-feed";
 import { ThemeToggle } from "./theme-toggle";
 
 const navItems = [
   { title: "Feeds", href: "/about" },
   { title: "Followed Feeds", href: "/blog" },
   { title: "Latest Posts", href: "/services" },
-  { title: "Add Feed", href: "/contact" },
 ];
 
 export function Header() {
@@ -50,6 +51,13 @@ export function Header() {
                   </Link>
                 </NavigationMenuItem>
               ))}
+              <AddFeed>
+                <NavigationMenuItem key={"add-feed"}>
+                  <NavigationMenuLink className="text-sm hover:underline underline-offset-2 transition-all duration-100 ease-linear">
+                    Add Feed
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+              </AddFeed>
             </NavigationMenuList>
           </NavigationMenu>
         </div>
@@ -91,15 +99,43 @@ export function Header() {
                 </Link>
               ))}
             </nav>
+            <AddFeed>
+              <h1 className="text-sm font-medium transition-colors hover:text-primary pt-4">
+                Add Feed
+              </h1>
+            </AddFeed>
           </SheetContent>
         </Sheet>
         <div className="md:w-auto md:flex-none flex justify-center items-center gap-2">
           <ThemeToggle />
-          <Button className="max-w-20 w-full md:w-auto" size="sm">
-            Sign In
-          </Button>
+          <AuthButton />
         </div>
       </div>
     </header>
+  );
+}
+
+function AuthButton() {
+  const { isAuthenticated, signout } = useAuth();
+  return (
+    <>
+      {isAuthenticated ? (
+        <Button
+          variant="destructive"
+          className="max-w-20 w-full md:w-auto"
+          size="sm"
+          onClick={signout}
+        >
+          Sign Out
+        </Button>
+      ) : (
+        <Link
+          href="/login"
+          className="bg-primary text-primary-foreground hover:bg-primary/90 h-9 rounded-md px-3 flex justify-center items-center"
+        >
+          Login
+        </Link>
+      )}
+    </>
   );
 }
