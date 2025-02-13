@@ -21,7 +21,7 @@ export default function RootLayout({
         <Providers>
           <Header />
           <Toaster />
-          {children}
+          <main className="w-[95%] md:w-4/5 mx-auto h-14">{children}</main>
         </Providers>
       </body>
     </html>
